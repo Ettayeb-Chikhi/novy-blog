@@ -1,0 +1,45 @@
+.title {
+    margin-top: 20px;
+    font-weight: 700;
+    align-self: center;
+}
+
+.userBox {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 20px;
+    align-self: flex-start;
+    width: 100%;
+}
+
+.content {
+    margin-top: 10px;
+}
+
+.keywords{
+    display: flex;
+    gap:10px;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+.chip{
+    font-size: 1.2rem;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.stats {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 5px;
+}
+.stats div{
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}

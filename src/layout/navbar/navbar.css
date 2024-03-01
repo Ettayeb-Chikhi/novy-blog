@@ -1,0 +1,24 @@
+.appBar{
+    margin-top: 10px;
+    max-width: 900px;
+    margin-inline: auto;
+    border-radius: 20px;
+    background-color: white;
+    color:black;
+}
+.appBar * {
+    color: black;
+}
+.logo{
+    font-family: 'monospace';
+    font-weight: 900;
+    letter-spacing: '.3rem';
+    color: #8458B3 ;
+    font-size: 1.5rem;
+}
+.items{
+    display:  flex;
+    justify-content: space-between;
+    align-items: center;
+}
+

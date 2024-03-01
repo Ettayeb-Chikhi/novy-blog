@@ -1,0 +1,10 @@
+.link{
+    text-decoration: none;
+    display: inline-block;
+    color: #8458B3;
+}
+
+.link:hover{
+    font-weight: 700;
+    font-size: 1rem;
+}
