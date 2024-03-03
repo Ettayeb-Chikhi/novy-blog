@@ -8,6 +8,7 @@ import { createComment } from '../lib/comment-service';
 import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import CommentList from '../components/CommentList';
 const Container = styled("div")(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
@@ -30,7 +31,7 @@ const Comment = ({ blogId }) => {
     const createCommentMutation = useMutation({
         mutationKey: ["comments", "create"],
         mutationFn: (request) => createComment(request),
-    
+
 
     })
     const onDataValid = (data) => {
@@ -42,7 +43,10 @@ const Comment = ({ blogId }) => {
         }
         createCommentMutation.mutate(request);
         queryClient.invalidateQueries({
-            queryKey:["blogs","num-comments"]
+            queryKey: ["blogs", "num-comments"]
+        })
+        queryClient.invalidateQueries({
+            queryKey: ["comments", "infinite"]
         })
         reset()
 
@@ -70,6 +74,7 @@ const Comment = ({ blogId }) => {
                         Comment <RateReviewIcon />
                     </Button>
                 </CommentForm>
+                <CommentList blogId={blogId} />
             </Container>
         </>
     )
