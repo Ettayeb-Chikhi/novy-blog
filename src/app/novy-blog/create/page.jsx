@@ -3,7 +3,7 @@ import BlogForm from '../../../components/BlogForm';
 const CreateBlog = () => {
   return (
     <>
-        <BlogForm />
+        <BlogForm isUpdate={false} blog={null}/>
     </>
   )
 }

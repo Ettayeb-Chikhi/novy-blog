@@ -8,6 +8,13 @@ const nextConfig = {
             permanent:true
         }
     ]
+   },
+   images:{
+        remotePatterns:[
+            {
+                hostname:"firebasestorage.googleapis.com"
+            }
+        ]
    }
 };
 

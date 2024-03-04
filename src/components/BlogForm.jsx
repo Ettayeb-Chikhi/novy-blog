@@ -17,8 +17,8 @@ import { getDate } from '../lib/utils';
 import { uploadFile } from '../lib/file-upload';
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
-import {useMutation} from '@tanstack/react-query';
-import {createBlog} from '../lib/blgos-service';
+import { useMutation } from '@tanstack/react-query';
+import { createBlog, updateBlog } from '../lib/blgos-service';
 import ImgContainer from '../components/ImageContainer';
 const DynamicQuill = dynamic(() => import("react-quill"), {
     ssr: false,
@@ -41,54 +41,78 @@ const modules = {
 }
 
 
-const BlogForm = () => {
+const BlogForm = ({ blog, isUpdate }) => {
     const user = useSelector(slice => slice.user);
-    const [fileName, setFileName] = useState(process.env.NEXT_PUBLIC_DEFAULT_IMG_COVER_URL);
-    const [value, setValue] = useState("");
-    const [isSubmit,setIsSubmit] = useState(false);
+    const [fileName, setFileName] = useState(blog?.imageUrl || process.env.NEXT_PUBLIC_DEFAULT_IMG_COVER_URL);
+    const [value, setValue] = useState(blog?.content || "");
+    const [isSubmit, setIsSubmit] = useState(false);
     const router = useRouter();
     const { register, handleSubmit, formState: { errors } } = useForm();
+    const defaultTags = blog?.keywords?.map(keyword => keyword.keyword).join(",") || "";
     const createBlogMutation = useMutation({
-        mutationKey:["create-blog"],
-        mutationFn:createBlog,
-        onSuccess : ()=>{
+        mutationKey: ["create-blog"],
+        mutationFn: createBlog,
+        onSuccess: () => {
+            router.push("/");
+        }
+    })
+    const updateBlogMutation = useMutation({
+        mutationKey: ["update-blog", blog?.blogId],
+        mutationFn: updateBlog,
+        onSuccess: () => {
             router.push("/");
         }
     })
     const handleFileChange = (e) => {
         console.log(e);
         if (e.target.files[0] == undefined) {
-            setFileName(process.env.NEXT_PUBLIC_DEFAULT_IMG_COVER_URL);
-            return "/inconnue.png"
+            setFileName(blog?.imageUrl || process.env.NEXT_PUBLIC_DEFAULT_IMG_COVER_URL);
+        } else {
+            const reader = new FileReader();
+            reader.readAsDataURL(e.target.files[0]);
+            reader.addEventListener("load", (ev) => {
+                setFileName(ev.target.result);
+            })
         }
-        const reader = new FileReader();
-        reader.readAsDataURL(e.target.files[0]);
-        reader.addEventListener("load", (ev) => {
-            setFileName(ev.target.result);
-        })
     }
 
-    const onDataValid =async  (data) => {
+    const onDataValid = async (data) => {
         setIsSubmit(true);
+        // keywords
         const keywords = data.keywords.split(",").map(tag => ({
             keywordId: null,
             keyword: tag.toLowerCase()
         }));
+        //image url
         const file = data.imageUrl[0];
-        const imgUrl = file ? await uploadFile(`blogs/${uuidv4()}-${file.name}`, file) : process.env.NEXT_PUBLIC_DEFAULT_IMG_COVER_URL;
+        let imgUrl;
+        if (isUpdate) {
+            imgUrl = blog.imageUrl;
+            if (blog.imageUrl == process.env.NEXT_PUBLIC_DEFAULT_IMG_COVER_URL && file) {
+                imgUrl = await uploadFile(`blogs/${uuidv4()}-${file.name}`, file);
+            } else if (file) {
+                imgUrl = await uploadFile(`${blog.imageUrl}`, file);
+                console.log(`img problem : ${imgUrl}`);
+            }
+        } else {
+            imgUrl = file ? await uploadFile(`blogs/${uuidv4()}-${file.name}`, file) : process.env.NEXT_PUBLIC_DEFAULT_IMG_COVER_URL;
+        }
+        // request object
         const blogRequest = {
+            blogId: isUpdate ? blog?.blogId : null,
             title: data.title,
             keywords: keywords,
             content: value,
-            publishDate: getDate(new Date()),
-            imageUrl:imgUrl,
-            userId:user.userId
+            publishDate: isUpdate ? blog?.publishDate : getDate(new Date()),
+            imageUrl: imgUrl,
+            userId: user.userId
         }
-
-        createBlogMutation.mutate(blogRequest);
+        if (isUpdate) {
+            updateBlogMutation.mutate(blogRequest)
+        } else {
+            createBlogMutation.mutate(blogRequest);
+        }
         setIsSubmit(false);
-
-
     }
     return (
         <>
@@ -115,6 +139,7 @@ const BlogForm = () => {
                         })}
                         error={errors.title != undefined}
                         helperText={errors.title?.message}
+                        defaultValue={blog?.title}
                     />
                     <TextField fullWidth label="Tags" variant="outlined" placeholder='Java,design ...'
                         {
@@ -125,6 +150,7 @@ const BlogForm = () => {
                         }
                         error={errors.keywords != undefined}
                         helperText={errors.keywords?.message}
+                        defaultValue={defaultTags}
                     />
                     <div style={{ minHeight: "300px" }}>
                         <DynamicQuill theme="bubble" modules={modules} className='editor' placeholder='Share your knowledge' value={value} onChange={setValue} />

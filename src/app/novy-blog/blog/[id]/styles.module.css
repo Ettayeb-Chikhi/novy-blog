@@ -43,3 +43,7 @@
     align-items: center;
     gap: 10px;
 }
+
+.likeSpan:hover {
+    text-decoration: underline;
+}

@@ -31,7 +31,15 @@ const Comment = ({ blogId }) => {
     const createCommentMutation = useMutation({
         mutationKey: ["comments", "create"],
         mutationFn: (request) => createComment(request),
-
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["blogs", "num-comments"]
+            })
+            queryClient.invalidateQueries({
+                queryKey: ["comments", "infinite"]
+            })
+            reset();
+        }
 
     })
     const onDataValid = (data) => {
@@ -42,13 +50,6 @@ const Comment = ({ blogId }) => {
             commentDate: getDate(new Date()),
         }
         createCommentMutation.mutate(request);
-        queryClient.invalidateQueries({
-            queryKey: ["blogs", "num-comments"]
-        })
-        queryClient.invalidateQueries({
-            queryKey: ["comments", "infinite"]
-        })
-        reset()
 
     }
     return (

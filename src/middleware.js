@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 // This function can be marked `async` if using `await` inside
-const protectedRoutes = ["/novy-blog/create","/novy-blog/profile"];
+const protectedRoutes = ["/novy-blog/create","/novy-blog/profile","/novy-blog/profile/edit"];
 export async  function middleware(request) {
     const isAuth = request.cookies.get("next-auth.session-token")?.value != undefined;
     const url = request.nextUrl.pathname;

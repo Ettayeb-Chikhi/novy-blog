@@ -20,6 +20,7 @@ import styles from './styles.module.css';
 import UsersLikesDialog from '../../../../components/UserLikesDialog';
 import { useMemo, useState } from 'react';
 import 'react-quill/dist/quill.bubble.css';
+import { useRouter } from 'next/navigation';
 const DynamicQuill = dynamic(() => import("react-quill"), {
     ssr: false,
 })
@@ -37,7 +38,7 @@ const SingleBlogPage = ({ params }) => {
     const blogId = params.id;
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
-
+    const router = useRouter();
     const handleClose = () => {
         setOpen(false);
     }
@@ -78,6 +79,9 @@ const SingleBlogPage = ({ params }) => {
         }
         likeMutation.mutate(request);
     }
+    const handleTagClick = (tag)=>{
+        router.push(`/novy-blog/tag/${tag}`)
+    }
 
     if (isLoading) {
         return <Wrapper>
@@ -104,7 +108,7 @@ const SingleBlogPage = ({ params }) => {
 
                 <div className={styles.keywords}>
                     {
-                        data.keywords.map(keyword => <Chip label={keyword.keyword} key={keyword.keywordId} className={styles.chip} />)
+                        data.keywords.map(keyword => <Chip label={keyword.keyword} key={keyword.keywordId} className={styles.chip} onClick={()=>handleTagClick(keyword.keyword)} />)
                     }
                 </div>
                 <div className={styles.stats}>
@@ -112,7 +116,7 @@ const SingleBlogPage = ({ params }) => {
                         <IconButton disabled={!authUser?.userId} size='large' onClick={handleLike}>
                             {hasLikeIt ? <ThumbUpIcon /> : <ThumbUpOutlinedIcon />}
                         </IconButton>
-                        <span onMouseEnter={()=>setOpen(true)}  onClick={()=>{setOpen(prev=>!prev)}}>{data?.userLikes.length || 0}</span>
+                        <span className={styles.likeSpan}   onClick={()=>{setOpen(prev=>!prev)}}>{data?.userLikes.length || 0}</span>
                     </div>
                     <div>
                         <ChatBubbleOutlineIcon /> <span>{isCommentsLoading ? 0 : commentCount.commentsCount}</span>

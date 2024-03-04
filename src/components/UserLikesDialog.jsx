@@ -9,6 +9,7 @@ import Avatar from '@mui/material/Avatar';
 const UserInfo = styled("div")(({theme})=>({
     display:"flex",
     gap:"10px",
+    marginBottom:"10px",
 }))
 
 const UserLikesDialog = ({ handleClose, open,users }) => {
@@ -20,7 +21,7 @@ const UserLikesDialog = ({ handleClose, open,users }) => {
             <DialogContent>
                 {
                     users?.map(user=>(
-                        <UserInfo>
+                        <UserInfo key={user.userId}>
                                 <Avatar src={user.profilePic} />
                                 <div>
                                     <h4>{user.username}</h4>

@@ -1,0 +1,15 @@
+.wrapper {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 30px;
+}

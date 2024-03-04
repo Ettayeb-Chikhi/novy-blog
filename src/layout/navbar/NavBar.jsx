@@ -18,6 +18,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import './navbar.css';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'
+
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
     [theme.breakpoints.down("md")]: {
@@ -68,6 +70,7 @@ const SearchInput = styled(TextField)(({ theme }) => ({
 
 }))
 const NavBar = () => {
+    
 
     const session = useSession();
     const isAuth = session.status == "authenticated";
@@ -84,6 +87,11 @@ const NavBar = () => {
         setAuthUser();
 
     }, [isAuth])
+    const handleSearch = (e)=>{
+        if(e.key=="Enter" && e.target.value.trim()!=""){
+            router.push(`/novy-blog/tag/${e.target.value}`)
+        }
+    }
     return (
         <StyledAppBar position="static" >
             <Container maxWidth="lg"  >
@@ -91,19 +99,18 @@ const NavBar = () => {
                     display: "flex",
                     justifyContent: "space-between"
                 }} >
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="span"
+                    <Link
                         className="logo"
+                        href="/"
                     >
                         NovyBlog
-                    </Typography>
+                    </Link>
 
-                    <SearchInput
+                    <SearchInput 
                         id="search-field"
                         placeholder='search by Tag'
-
+                        onKeyDown={handleSearch}
+                        required
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start" sx={{ cursor: "pointer" }}>
