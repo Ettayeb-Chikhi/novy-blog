@@ -1,7 +1,6 @@
 "use client"
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import styled from '@mui/material/styles/styled';
@@ -16,8 +15,8 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/user/user';
 import CircularProgress from '@mui/material/CircularProgress';
 import './navbar.css';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link'
 
 
@@ -70,12 +69,14 @@ const SearchInput = styled(TextField)(({ theme }) => ({
 
 }))
 const NavBar = () => {
-    
+
 
     const session = useSession();
     const isAuth = session.status == "authenticated";
     const isLoading = session.status == "loading";
     const router = useRouter();
+    const pathName = usePathname();
+
     const dispatch = useDispatch();
     useEffect(() => {
         const setAuthUser = async () => {
@@ -87,11 +88,16 @@ const NavBar = () => {
         setAuthUser();
 
     }, [isAuth])
-    const handleSearch = (e)=>{
-        if(e.key=="Enter" && e.target.value.trim()!=""){
+    const handleSearch = (e) => {
+        if (e.key == "Enter" && e.target.value.trim() != "") {
             router.push(`/novy-blog/tag/${e.target.value}`)
         }
     }
+    const [term, setTerm] = useState("");
+    useEffect(() => {
+        const urlAsArray = pathName.split("/");
+        setTerm(urlAsArray.includes("tag") ? urlAsArray.pop() : "");
+    }, [pathName])
     return (
         <StyledAppBar position="static" >
             <Container maxWidth="lg"  >
@@ -106,10 +112,11 @@ const NavBar = () => {
                         NovyBlog
                     </Link>
 
-                    <SearchInput 
+                    <SearchInput
                         id="search-field"
                         placeholder='search by Tag'
                         onKeyDown={handleSearch}
+                        defaultValue={term}
                         required
                         InputProps={{
                             startAdornment: (
@@ -121,12 +128,12 @@ const NavBar = () => {
                         variant="standard"
                     />
                     {
-                        isLoading ? <CircularProgress/> : (
+                        isLoading ? <CircularProgress /> : (
                             isAuth ? (<><WriteButton endIcon={<CreateIcon />} onClick={() => { router.push("/novy-blog/create") }} >Write</WriteButton>
                                 <UserMenu /></>) : <BaseButton onClick={signIn}>Login</BaseButton>
                         )
                     }
-                  
+
                 </Toolbar>
             </Container>
         </StyledAppBar>
